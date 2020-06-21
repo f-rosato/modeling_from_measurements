@@ -1,7 +1,7 @@
 clear all; close all; clc
 
 % loads data
-population_data
+load data/population_data.mat
 v = pop;
 
 %% settings ---------------------------------------------------

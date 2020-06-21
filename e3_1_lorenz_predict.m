@@ -47,12 +47,12 @@ switch mode
         hiddenLayerSize = [9,3];
         nn_train_regr
 
-        save('lornet_1.mat', 'net')
+        save('saved_nets/lornet_1.mat', 'net')
         
      %% train the network on the training rho values
     case 'test'
         % load a previously trained network
-        load('lornet_1.mat')
+        load('saved_nets/lornet_1.mat')
         
         % prepare the test data and predict
         for r = 1:2
@@ -70,12 +70,14 @@ switch mode
             
             figure(2)
             subplot(1,2,r)
-            plot3(x_true,y_true,z_true, 'k-', 'Linewidth', [2]);
+
+            plot3(x_true,y_true,z_true, 'k-', 'Linewidth', [1]);
             hold on
-            plot3(x_pre,y_pre,z_pre, 'r.', 'Linewidth', [1], 'MarkerSize',20);
-            
+            plot3(x_pre,y_pre,z_pre, 'r.', 'Linewidth', [1], 'MarkerSize',10);
             xlabel('x')
             ylabel('y')
+            zlabel('z')
+            title(['Lorenz NN predict \rho=', num2str(rho)])
             grid on
 
         end

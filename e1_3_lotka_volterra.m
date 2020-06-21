@@ -3,7 +3,7 @@ clear all
 % requires script "population_data.m"
 % requires function "lv.m"
 
-population_data;
+load data/population_data.mat;
 
 global year_v
 global years_span

@@ -1,6 +1,6 @@
 clear all
-population_data;
 
+load data/population_data
 U = pop';
 
 %normalize the data to avoid disproportionate Theta

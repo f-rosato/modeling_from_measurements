@@ -1,6 +1,6 @@
 clear all; close all;
 
-load BZ
+load data/BZ.mat
 
 
 % remove the mean from the data

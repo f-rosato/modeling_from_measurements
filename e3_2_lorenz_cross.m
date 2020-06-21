@@ -49,7 +49,7 @@ switch mode
      %% train the network on the training rho values
     case 'test'
         % load a previously trained network
-        load('lorcross_1.mat')
+        load('saved_nets/lorcross_1.mat')
         % prepare the test data and predict
         rho = 28;
         t=0:0.01:20;
@@ -70,6 +70,7 @@ switch mode
         title('Lorenz system - Predicting lobe transition')
         xlabel('x')
         ylabel('y')
+        zlabel('z')
         grid on
         c = colorbar();
         c.Label.String = 'Est. P of imminent transition';

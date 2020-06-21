@@ -1,10 +1,11 @@
 clear all; close all;
-load reaction_diffusion_big
+
+load data/reaction_diffusion_big.mat
 
 %% Preparation of data
 % choose measurement and rank
-r = 3;
-measurement = v;
+r = 4;
+measurement = u;
 
 % flatten the "measurement" from matrix to vector
 flat_u = zeros(0);
@@ -12,7 +13,6 @@ n = size(measurement,1);
 for frame = 1:length(t)
     ur = reshape(measurement(:,:,frame), [1, n^2]);
     flat_u = [flat_u; ur];
-    
 end
 flat_u = flat_u';
 
@@ -24,20 +24,19 @@ tr_fU = fU(:,1:r); tr_fS = fS(1:r,1:r); tr_fV = fV(:,1:r);
 
 % check out the low-rank modes strength
 figure(1)
-plotsigmalog(fS, r)
+plotsigma(fS, r)
 
 %% Plot of the modes
 modes = cell(1,r);
 figure(2)
 for mode_no = 1:r
     fur = tr_fU(:,mode_no);
-    flat_v = reshape(fur, [n, n]);
-    modes{mode_no} = flat_v;
+    flat_k = reshape(fur, [n, n]);
+    modes{mode_no} = flat_k;
     
     subplot(1,r, mode_no)
-    contourf(x,y,modes{mode_no}); shading interp; colormap(hot)
+    pcolor(x,y,modes{mode_no}); shading interp; colormap(hot)
     title(['Mode #', num2str(mode_no)]);
-    colorbar();
 end
 
 %% Analysis in the low-rank variables realm
@@ -62,29 +61,36 @@ title('Low-rank variables')
 legend(legend_items)
 xlabel('frame')
 
-%% Make a NN autoencoder
-data_mtx = reduced_states(1:end-1,:)';
-target_v = reduced_states(2:end,:)';
-hiddenLayerSize = [6,3];
-nn_train_regr
+
+%% rebuild the approximated 3d matrix
+approx_flat_u = tr_fU * tr_fS * tr_fV';
+approx_u = zeros(size(u));
+for frame = 1:length(t)
+    fur = approx_flat_u(:, frame);
+    flat_u = reshape(fur, [n, n]);
+    approx_u(:,:,frame) = flat_u;
+end
+
+% compare frames
+nframe = 106;
+
+figure(5)
+subplot(1,2,1)
+pcolor(x,y,u(:,:,nframe)); shading interp; colormap(hot)
+title(['Original data - frame #', num2str(nframe)])
+subplot(1,2,2)
+pcolor(x,y,approx_u(:,:,nframe)); shading interp; colormap(hot)
+title(['Approximation - r=', num2str(r)])
 
 
-% %% rebuild the approximated 3d matrix
-% approx_flat_u = tr_fU * tr_fS * tr_fV';
-% approx_u = zeros(size(u));
-% for frame = 1:length(t)
-%     fur = approx_flat_u(frame,:);
-%     flat_u = reshape(fur, [n, n]);
-%     approx_u(:,:,frame) = flat_u;
-% end
+% %% Make a NN autoencoder and see how it performs
+% data_mtx = reduced_states(1:end-1,:)';
+% target_v = reduced_states(2:end,:)';
+% hiddenLayerSize = [6,3];
+% nn_train_regr
 % 
-% % compare frames
-% nframe = 85;
-% 
-% figure(3)
-% subplot(1,2,1)
-% pcolor(x,y,u(:,:,nframe)); shading interp; colormap(hot)
-% title(['Original data - frame #', num2str(nframe)])
-% subplot(1,2,2)
-% pcolor(x,y,approx_u(:,:,nframe)); shading interp; colormap(hot)
-% title(['Approximation - r=', num2str(r)])
+% predicted_v = net(data_mtx);
+% figure(4)
+% plotregression(target_v, predicted_v);
+
+

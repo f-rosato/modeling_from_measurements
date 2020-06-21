@@ -1,7 +1,7 @@
 clear all; close all
 
 %% generate the data
-init_cond_type = 1;
+init_cond_type = 3;
 
 [u, t, x] = ks_uu(init_cond_type);
 [nts0, nxs0] = size(u);
@@ -23,7 +23,7 @@ nxs = nxs0;
 
 %% preparation of the data to feed to the neural network
 x_window = 9;
-t_window = 1;
+t_window = 2;
 
 data_mtx = zeros([x_window * t_window, 1]);
 target_v = 0;
@@ -68,7 +68,6 @@ data_mtx = scale_down(data_mtx);
 target_v = scale_down(target_v);
 
 
-
 %% TRAINING HAPPENS HERE.....
 % hiddenLayerSize = [9,9,3];
 % nn_train_regr  % training script uses data_mtx and target_v; outputs net
@@ -78,7 +77,11 @@ target_v = scale_down(target_v);
 
 %% EVALUATION OF PREDICTION
 % load my trained network
-load ksnet_2.mat
+
+% IMPORTANT:
+% ksnet_2 is a 9x1 net
+% ksnet_1 is a 9x2 net
+load('saved_nets/ksnet_1.mat')
 
 % we predict and reshape the result and confront it
 predicted_v = net(data_mtx);
