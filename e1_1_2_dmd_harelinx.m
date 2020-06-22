@@ -60,10 +60,15 @@ for t = 1:n_test
     else
         
         % ALTERNATIVE CALCULATION MODE
-        % x_tilde_predicted = A_tilde^t*x_l_tilde;  % predict POD
-        % x_predicted = U_r*x_tilde_predicted; % maps back to full state
+        % inspired by observation on the book: A_tilde describes the
+        % dynamics of the POD coefficients
+        x_tilde_predicted = A_tilde^t*x_l_tilde;  % predict POD
+        x_predicted = U_r*x_tilde_predicted; % maps back to full state
         
-        x_predicted = U_r * A_tilde * U_r' * x_l;
+        % CLASSIC CALCULATION MODE
+        %x_predicted = U_r * A_tilde * U_r' * x_l;
+        %x_l = x_predicted;
+        
         X_predicted(:, t) = x_predicted;
     end
 end
