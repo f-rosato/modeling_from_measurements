@@ -11,6 +11,7 @@ title('Mean of the data (to remove)')
 mmask = repmat(mask,1,1,size(BZ_tensor,3));
 BZ_tensor = BZ_tensor - mmask;
 
+
 r = 10;
 measurement = BZ_tensor;
 n = size(measurement,1);

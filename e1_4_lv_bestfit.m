@@ -11,10 +11,30 @@ Up = diff(U);
 
 % garbage in, garbage out. These derivatives are noisy
 sUp = smoothdata(Up);
+% sUp = Up;
 
-% plot(xp);
-% hold on
-% plot(sxp);
+figure(2)
+subplot(2,1,1)
+plot(Up(:,1), 'Linewidth', [3]);
+hold on
+grid on
+plot(sUp(:,1), 'Linewidth', [3]);
+legend('raw', 'smoothed')
+ylabel('norm. population')
+xlabel('year')
+xticklabels(year)
+title('Hare')
+
+subplot(2,1,2)
+plot(Up(:,2), 'Linewidth', [3]);
+hold on
+grid on
+plot(sUp(:,2), 'Linewidth', [3]);
+legend('raw', 'smoothed')
+ylabel('norm. population')
+xlabel('year')
+xticklabels(year)
+title('Linx')
 
 % shave the last data point with no known fwd derivative
 U = U(1:end-1, :); 
@@ -39,6 +59,31 @@ Theta(:,9) = sin(x);
 Theta(:,10) = sin(y);
 
 Csi = zeros(10, size(U,2));
+names_gr = {['Hare '], ['Linx ']};
+figure(1)
+sp = 1;
+for ix = 1:2
+    
+    % do lasso
+    [B, FitInfo] = lasso(Theta, Up(:,ix), 'DFmax', 4); %  'CV', 3, 'DFmax', 4);
+
+    % select only the good stuff
+    nonzero_rows = find(~all(B==0,2));
+    names = Theta_names(nonzero_rows);
+    B_vip = B(nonzero_rows, :);
+    
+    lambda_labels = cell(1,length(FitInfo.Lambda));
+    for ii = 1:length(FitInfo.Lambda)
+        lambda_labels{ii} = sprintf('%0.2e',FitInfo.Lambda(ii));
+    end
+    subplot(4,1,sp);
+    sp = sp + 1;
+    heatmap(lambda_labels, names, B_vip, 'Colormap', colormap('jet'), 'XLabel', 'Lambda', 'YLabel', 'function')
+    title([names_gr{ix}, '- SINDy modes vs lambda (raw data)'])
+    
+end
+
+
 
 for ix = 1:2
     
@@ -50,36 +95,14 @@ for ix = 1:2
     names = Theta_names(nonzero_rows);
     B_vip = B(nonzero_rows, :);
     
-    % in order to evaluate the results, we create a custom
-    % scatter-stem plot of the selected coefficients varying with lambda
-    figure
-    scatter_x = 0;
-    scatter_y = 0;
-    scatter_z = 0;
-    
-    [ll, cc] = meshgrid(FitInfo.Lambda, 1:length(nonzero_rows));
-    index = 1;
-    for r = 1:size(ll,1)
-        for c = 1:size(ll,2)
-            if B_vip(r,c) ~= 0
-                scatter_x(index) = ll(r,c);
-                scatter_y(index) = cc(r,c);
-                scatter_z(index) = B_vip(r,c);
-                index = index + 1;
-            end
-        end
+    lambda_labels = cell(1,length(FitInfo.Lambda));
+    for ii = 1:length(FitInfo.Lambda)
+        lambda_labels{ii} = sprintf('%0.2e',FitInfo.Lambda(ii));
     end
-        
-    stem3(scatter_x, scatter_y, scatter_z+1, ':d', 'LineWidth', 1);
-    yticks(1:length(nonzero_rows));
-    yticklabels(names);
-    zlabel('coefficient')
-    xlabel('lambda')
-    % lassoPlot(B,FitInfo,'PlotType','CV');
-end
 
-% clear all
-% X = randn(100,5);
-% weights = [0;2;0;-3;0]; % Only two nonzero coefficients
-% y = X*weights + randn(100,1)*0.1; % Small added noise
-% B = lasso(X,y);
+    subplot(4,1,sp);
+    sp = sp + 1;
+    heatmap(lambda_labels, names, B_vip, 'Colormap', colormap('jet'), 'XLabel', 'Lambda', 'YLabel', 'function')
+    title([names_gr{ix}, '- SINDy modes vs lambda (data smoothed)'])
+    
+end

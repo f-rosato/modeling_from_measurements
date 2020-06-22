@@ -45,13 +45,26 @@ figure(1)
 subplot(2,1,1)
 plot(year, X_true, 'k', 'Linewidth', [2])
 hold on
+grid on
+ylabel('population')
+xlabel('year')
+title('Hare')
+xticks(year)
+xtickangle(90)
 plot(year_f, X_model_f, 'r--', 'Linewidth', [2])
+legend('Actual', 'Lotka-Volterra fit', 'Location','northwest')
 
 subplot(2,1,2)
 plot(year, Y_true, 'k', 'Linewidth', [2])
 hold on
+grid on
+ylabel('population')
+xticks(year)
+xtickangle(90)
+xlabel('year')
+title('Lynx')
 plot(year_f, Y_model_f, 'r--', 'Linewidth', [2])
-
+legend('Actual', 'Lotka-Volterra fit', 'Location','northwest')
 
 %% definition of the function to optimize
 function distance = lotv_dist(parameters)
@@ -108,3 +121,4 @@ function distance = lotv_dist(parameters)
 
     % distance = sum([abs(X_true_hf - X_model_hf), abs(Y_true_hf - Y_model_hf)]);
 end
+

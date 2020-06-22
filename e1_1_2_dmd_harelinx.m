@@ -6,9 +6,9 @@ v = pop;
 
 %% settings ---------------------------------------------------
 % number of steps back in the time delay vector 
-n = 4;
+n = 3;
 % rank of the approximation 
-r = 5;
+r = 3;
 % how many "test" results to keep aside
 n_test = 7;
 
@@ -23,8 +23,8 @@ n_test = 7;
 X_tot = vectd(v(1,:), v(2,:), size(v,2) - n, n);
 
 % computes X and X'
-X = X_tot(:,1:end-1 -n_test);
-Xp = X_tot(:,2:end -n_test);
+X = X_tot(:,1:end - 1 -n_test);
+Xp = X_tot(:,2:end - n_test);
 
 % matrix of test cases
 X_test = X_tot(:,end - n_test + 1 :end);
@@ -73,10 +73,10 @@ for t = 1:n_test
     end
 end
 
-% since we predicted the whole time-delay vector, only the first two rows
+% since we predicted the whole time-delay vector, only the last two rows
 % represent the current situation
-X2_predicted = X_predicted(1:2,:);
-X2_test = X_test(1:2,:);
+X2_predicted = X_predicted(end-1:end,:);
+X2_test = X_test(end-1:end,:);
 years_predicted = year(end-n_test+1:end);
 
 % let's plot predictions vs harsh reality
@@ -97,7 +97,7 @@ for index = 1:2
     ylabel('population')
     xlabel('year')
     xticks(years_predicted)
-    legend('actual', 'predicted', 'Location', 'southwest')
+    legend('actual', 'predicted', 'Location', 'northwest')
 end
 
 
