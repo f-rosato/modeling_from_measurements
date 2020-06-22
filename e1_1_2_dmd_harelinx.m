@@ -13,7 +13,7 @@ r = 5;
 n_test = 7;
 
 %notes: --------------------------------------------------------
-% r=0 defaults to EXACT DMD; it's the same as r = n*2
+% r=0 uses all SVD modes; it's the same as r = n*2
 % n=1, r=2 we use just the data with no time delay embedding
 %---------------------------------------------------------------
 
@@ -31,7 +31,7 @@ X_test = X_tot(:,end - n_test + 1 :end);
 
 %% core calculations
 if r==0
-    A = Xp*pinv(X);  % exact
+    A = Xp*pinv(X);
 else
     [U,Sigma,V] = svd(X, 'econ');
     U_r = U(:,1:r);
@@ -58,8 +58,12 @@ for t = 1:n_test
     if r==0
         X_predicted(:, t) = A^t*x_l;
     else
-        x_tilde_predicted = A_tilde^t*x_l_tilde;  % predict POD
-        x_predicted = U_r*x_tilde_predicted; % maps back to full state
+        
+        % ALTERNATIVE CALCULATION MODE
+        % x_tilde_predicted = A_tilde^t*x_l_tilde;  % predict POD
+        % x_predicted = U_r*x_tilde_predicted; % maps back to full state
+        
+        x_predicted = U_r * A_tilde * U_r' * x_l;
         X_predicted(:, t) = x_predicted;
     end
 end
@@ -74,7 +78,7 @@ years_predicted = year(end-n_test+1:end);
 if r > 0
     pr_leg = ['(trunc. r=', num2str(r), ')'];
 else
-    pr_leg = '(exact DMD)';
+    pr_leg = '(All modes)';
 end
 names = {['Hare ', pr_leg], ['Linx ', pr_leg]};
 for index = 1:2
